@@ -76,8 +76,6 @@ if "selected_index" not in st.session_state:
 if "selected_type" not in st.session_state:
     st.session_state.selected_type = None
 
-st.title("¡Bienvenido, EP! Descubre tus recomendaciones de anime")
-
 # Si hay un ítem seleccionado, mostramos detalles
 if st.session_state.selected_index is not None and st.session_state.selected_type is not None:
     if st.session_state.selected_type == "movie":
@@ -109,6 +107,7 @@ if st.session_state.selected_index is not None and st.session_state.selected_typ
         st.session_state.selected_type = None
 
 else:
+    st.title("¡Bienvenido, EP! Descubre tus recomendaciones de anime")
     # Mostrar películas
     st.markdown("## Recomendación de Películas")
     if final_data_movies:
