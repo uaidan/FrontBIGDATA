@@ -76,7 +76,7 @@ if "selected_index" not in st.session_state:
 if "selected_type" not in st.session_state:
     st.session_state.selected_type = None
 
-st.title("Recomendador de Anime!")
+st.title("¡Bienvenido, EP! Descubre tus recomendaciones de anime")
 
 # Si hay un ítem seleccionado, mostramos detalles
 if st.session_state.selected_index is not None and st.session_state.selected_type is not None:
