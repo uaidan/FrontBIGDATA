@@ -3,11 +3,11 @@ import requests
 from time import sleep
 import streamlit as st
 
-# Estado inicial de listas
+#Listas con el contenido final
 final_data_movies = []
 final_data_series = []
 
-# Función para obtener datos detallados de un anime
+#Funcion que devuelve los detalles de un anime medinate ID
 def obtain_movie_data(anime_id):
     url = f"https://api.jikan.moe/v4/anime/{anime_id}/full"
     response = requests.get(url)
@@ -30,25 +30,28 @@ def obtain_movie_data(anime_id):
     else:
         return {"error": f"Error al hacer la solicitud. Código de estado: {response.status_code}"}
 
-
+#Cargamos los csv
 pelis_csv = 'recommendations_movies.csv'
 series_csv = 'recommendations_series.csv'
 
 df_movies = pd.read_csv(pelis_csv)
 df_series = pd.read_csv(series_csv)
 
+#Filtramos y nos quedamos solo con el ID y la nota
 df_movies = df_movies[['ID', 'avg_rating']]
 df_series = df_series[['ID', 'avg_rating']]
 
-tupla_movies = list(df_movies.itertuples(index=False, name=None)) # Tupla con (ID, rating) de películas
-tupla_series = list(df_series.itertuples(index=False, name=None)) # Tupla con (ID, rating) de series
+#Cremos una tupla para guardar el ID y nota
+tupla_movies = list(df_movies.itertuples(index=False, name=None))
+tupla_series = list(df_series.itertuples(index=False, name=None))
 
+#Segmentamos cada campo en diferentes listas
 rating_movies = [t[1] for t in tupla_movies]
 rating_series = [t[1] for t in tupla_series]
 ids_movies = [t[0] for t in tupla_movies]
 ids_series = [t[0] for t in tupla_series]
 
-# Carga de datos (solo sse realiza una vez)
+#Estado que comprueba si se disponde de datos, en caso contrario se obtienen
 if "final_data_loaded" not in st.session_state:
     st.session_state.final_data_movies = []
     st.session_state.final_data_series = []
@@ -65,18 +68,17 @@ if "final_data_loaded" not in st.session_state:
 
     st.session_state.final_data_loaded = True
 
-# Recuperar datos de la sesión
+#Volcado de datos
 final_data_movies = st.session_state.final_data_movies
 final_data_series = st.session_state.final_data_series
 
-
-# Estado para controlar selección
+#Estado para controlar selección de anime
 if "selected_index" not in st.session_state:
     st.session_state.selected_index = None
 if "selected_type" not in st.session_state:
     st.session_state.selected_type = None
 
-# Si hay un ítem seleccionado, mostramos detalles
+#Si se ha selecionado un anime se muestran sus detalles
 if st.session_state.selected_index is not None and st.session_state.selected_type is not None:
     if st.session_state.selected_type == "movie":
         datos = final_data_movies[st.session_state.selected_index]
@@ -85,7 +87,7 @@ if st.session_state.selected_index is not None and st.session_state.selected_typ
         datos = final_data_series[st.session_state.selected_index]
         anime_id = ids_series[st.session_state.selected_index]
 
-    # Mostrar datos detallados
+    #Muestra de datos (front)
     st.image(datos.get("large_image_url"), width=300)
     st.header(datos.get("title_english", "Título no disponible"))
     st.subheader(datos.get("title_japanese", "Título japonés no disponible"))
@@ -101,14 +103,15 @@ if st.session_state.selected_index is not None and st.session_state.selected_typ
     else:
         st.info("No hay tráiler disponible.")
 
-    # Volver a la lista
+    #Opcion para poder volver a regresa al menu inicial
     if st.button("Volver a la lista"):
         st.session_state.selected_index = None
         st.session_state.selected_type = None
 
 else:
+    #Menu inicial
     st.title("¡Bienvenido, EP! Descubre tus recomendaciones de anime")
-    # Mostrar películas
+    
     st.markdown("## Recomendación de Películas")
     if final_data_movies:
         cols = st.columns(len(final_data_movies))
@@ -121,7 +124,6 @@ else:
                     st.session_state.selected_index = i
                     st.session_state.selected_type = "movie"
 
-    # Mostrar series
     st.markdown("## Recomendación de Series")
     if final_data_series:
         cols = st.columns(len(final_data_series))
